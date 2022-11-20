@@ -1,5 +1,5 @@
 const tmi = require('tmi.js');
-const pw = 'oauth:mjbb6v37bqu3ev504zdy9zpcibom8w'
+const pw = 'oauth:cnqaq5m0tien37vmqyw82flwg9la6q';
 
 // Define configuration options
 const opts = {
@@ -32,15 +32,34 @@ function onMessageHandler (target, context, msg, self) {
     const splitMsg = msg.split(' ');
     const commandName = splitMsg[0];
     const commandArgs = splitMsg.slice(1, splitMsg.length);
-    console.log(splitMsg)
+    console.log(splitMsg);
+
+    // List of commands
+    const commands = ['commands', 'crk', 'discord'];
 
     // If the command is known, let's execute it
+    if (commandName === '!commands') {
+
+        let commandsMsg = '!commands';
+
+        for (let i = 1; i < commands.length; i++) {
+            commandsMsg += ` | !${commands[i]}`;
+        }
+
+        client.say(target, commandsMsg);
+        console.log(`* Executed ${commandName} command`);
+    }
     if (commandName === '!crk') {
-        const ign = 'DivinityC'
-        const guild = 'Matcha'
-        const server = 'Hollyberry'
+        const ign = 'DivinityC';
+        const guild = 'Matcha';
+        const server = 'Hollyberry';
 
         client.say(target, `IGN: ${ign} | Guild: ${guild} | Server: ${server}`);
+        console.log(`* Executed ${commandName} command`);
+    } else if (commandName === '!discord') {
+        const discordLink = 'To be raccmade...';
+
+        client.say(target, discordLink);
         console.log(`* Executed ${commandName} command`);
     } else {
         console.log(`* Unknown command ${commandName}`);

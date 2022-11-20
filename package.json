@@ -1,7 +1,7 @@
 {
-  "name": "dice",
+  "name": "raccmod",
   "version": "1.0.0",
-  "description": "Simulates rolling a 6-sided dice",
+  "description": "Twitch chatbot",
   "main": "bot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,5 +10,13 @@
   "license": "ISC",
   "dependencies": {
     "tmi.js": "^1.8.5"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hechiong/twitch_chatbot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hechiong/twitch_chatbot/issues"
+  },
+  "homepage": "https://github.com/hechiong/twitch_chatbot#readme"
 }
