@@ -26,6 +26,9 @@ client.on('connect', function (connection) {
     connection.sendUTF(`PASS ${pw}`);
     connection.sendUTF(`NICK ${account}`);
 
+    // Make interval object and sendUTF function for tracking number of
+    // messages the bot sends (rate is 100 messages per 30 seconds)
+
     // Set a timer to post future 'move' messages. This timer can be
     // reset if the user passes, !move [minutes], in chat.
     /*let intervalObj = setInterval(() => {
@@ -131,8 +134,10 @@ client.on('connect', function (connection) {
                             // connection.sendUTF(`PRIVMSG ${channel} :${moveMessage}`);
                             break;
                         case 'PART':
-                            console.log('The channel must have banned (/ban) the bot.');
-                            connection.close();
+                            if (parsedMessage.source.nick == 'raccmod') {
+                                console.log('The channel must have banned (/ban) the bot.');
+                                connection.close();
+                            }
                             break;
                         case 'NOTICE':
                             // If the authentication failed, leave the channel.
@@ -145,6 +150,16 @@ client.on('connect', function (connection) {
                                 connection.sendUTF(`PART ${channel}`);
                             }
                             break;
+                        case 'CLEARCHAT':        // maybe
+                        case 'CLEARMSG':         // maybe
+                        case 'GLOBALUSERSTATE':
+                        case 'HOSTTARGET':
+                        case 'NOTICE':           // maybe
+                        case 'RECONNECT':
+                        case 'ROOMSTATE':        // maybe
+                        case 'USERNOTICE':       // maybe
+                        case 'USERSTATE':        // maybe
+                        case 'WHISPER':          //maybe
                         default:
                             ; // Ignore all other IRC messages.
                     }
@@ -155,8 +170,11 @@ client.on('connect', function (connection) {
 
 });
 
+// Non-SSL WebSocket client
 client.connect('ws://irc-ws.chat.twitch.tv:80');
 
+// SSL WebSocket client
+// client.connect('wss://irc-ws.chat.twitch.tv:443');
 
 // Parses an IRC message and returns a JSON object with the message's 
 // component parts (tags, source (nick and host), command, parameters). 
