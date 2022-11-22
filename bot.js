@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-const pw = 'oauth:2yorvs6knxeiyvenq5a0rwaf3d9448';
+const pw = 'oauth:473an01uvrbseda81zngfz79yrpg7v';
 const WebSocketClient = require('websocket').client;
 
 const client = new WebSocketClient();
 const channel = '#trinityc4';  // Replace with your channel.
 const account = 'raccmod';   // Replace with the account the bot runs as
 
+const botCommands = ['commands', 'crk', 'discord'];
 const moveMessage = 'Get up and move, your body will thank you!';
 const defaultMoveInterval = 1000 * 60 * 1; // Set to 1 minute for testing.
 let moveInterval = defaultMoveInterval;
@@ -18,12 +19,10 @@ client.on('connect', function (connection) {
     console.log('WebSocket Client Connected');
 
     // Giving the bot Twitch IRC capabilities.
-
     connection.sendUTF('CAP REQ :twitch.tv/commands twitch.tv/membership twitch.tv/tags');
 
     // Authenticate with the Twitch IRC server and then join the channel.
     // If the authentication fails, the server drops the connection.
-
     connection.sendUTF(`PASS ${pw}`);
     connection.sendUTF(`NICK ${account}`);
 
@@ -46,7 +45,6 @@ client.on('connect', function (connection) {
     });
 
     // Process the Twitch IRC message.
-
     connection.on('message', function (ircMessage) {
         if (ircMessage.type === 'utf8') {
             let rawIrcMessage = ircMessage.utf8Data.trimEnd();
@@ -57,12 +55,13 @@ client.on('connect', function (connection) {
                 let parsedMessage = parseMessage(message);
 
                 if (parsedMessage) {
-                    console.log(`Message command: ${parsedMessage.command.command}`);
-                    console.log(`\n${JSON.stringify(parsedMessage, null, 3)}`)
+                    // console.log(`Message command: ${parsedMessage.command.command}`);
+                    // console.log(`\n${JSON.stringify(parsedMessage, null, 3)}`)
 
                     switch (parsedMessage.command.command) {
                         case 'PRIVMSG':
                             switch (parsedMessage.command.botCommand) {
+                                /*
                                 case 'move':
                                     if (parsedMessage.command.botCommandParams.length == 0 ||
                                         !isNumeric(parsedMessage.command.botCommandParams[0])) {
@@ -92,6 +91,29 @@ client.on('connect', function (connection) {
                                     connection.sendUTF(`PART ${channel}`);
                                     connection.close();
                                     break;
+                                */
+                                case 'commands':
+                                    let commandsMsg = `!${botCommands[0]}`;
+
+                                    for (let i = 1; i < botCommands.length; i++) {
+                                        commandsMsg += ` | !${botCommands[i]}`;
+                                    }
+
+                                    connection.sendUTF(`PRIVMSG ${channel} :${commandsMsg}`);
+                                    break;
+                                case 'crk':
+                                    const guild = 'Matcha';
+                                    const ign = 'DivinityC';
+                                    const server = 'Hollyberry';
+                                    const crkMsg = `IGN: ${ign} | Guild: ${guild} | Server: ${server}`;
+
+                                    connection.sendUTF(`PRIVMSG ${channel} :${crkMsg}`);
+                                    break;
+                                case 'discord':
+                                    const discordLink = 'To be raccmade...';
+
+                                    connection.sendUTF(`PRIVMSG ${channel} :${discordLink}`);
+                                    break;
                                 default:
                                     ; // Ignore all other bot commands or Twitch chat messages
                             }
@@ -106,7 +128,7 @@ client.on('connect', function (connection) {
                         case 'JOIN':
                             // Send the initial move message. All other move messages are
                             // sent by the timer.
-                            connection.sendUTF(`PRIVMSG ${channel} :${moveMessage}`);
+                            // connection.sendUTF(`PRIVMSG ${channel} :${moveMessage}`);
                             break;
                         case 'PART':
                             console.log('The channel must have banned (/ban) the bot.');
