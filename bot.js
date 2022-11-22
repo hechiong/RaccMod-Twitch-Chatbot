@@ -134,7 +134,7 @@ client.on('connect', function (connection) {
                             // connection.sendUTF(`PRIVMSG ${channel} :${moveMessage}`);
                             break;
                         case 'PART':
-                            if (parsedMessage.source.nick == 'raccmod') {
+                            if ('raccmod' === parsedMessage.source.nick) {
                                 console.log('The channel must have banned (/ban) the bot.');
                                 connection.close();
                             }
