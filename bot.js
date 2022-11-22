@@ -28,9 +28,9 @@ client.on('connect', function (connection) {
 
     // Set a timer to post future 'move' messages. This timer can be
     // reset if the user passes, !move [minutes], in chat.
-    let intervalObj = setInterval(() => {
+    /*let intervalObj = setInterval(() => {
         connection.sendUTF(`PRIVMSG ${channel} :${moveMessage}`);
-    }, moveInterval);
+    }, moveInterval);*/
 
     connection.on('error', function (error) {
         console.log("Connection Error: " + error.toString());
@@ -41,7 +41,7 @@ client.on('connect', function (connection) {
         console.log(`close description: ${connection.closeDescription}`);
         console.log(`close reason code: ${connection.closeReasonCode}`);
 
-        clearInterval(intervalObj);
+        // clearInterval(intervalObj);
     });
 
     // Process the Twitch IRC message.
