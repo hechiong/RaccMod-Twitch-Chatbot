@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const pw = 'oauth:9444hjrucgkc7jdt9s5tdvpsbfay89';
+const pw = 'oauth:2yorvs6knxeiyvenq5a0rwaf3d9448';
 const WebSocketClient = require('websocket').client;
 
 const client = new WebSocketClient();
@@ -17,10 +17,9 @@ client.on('connectFailed', function (error) {
 client.on('connect', function (connection) {
     console.log('WebSocket Client Connected');
 
-    // This is a simple bot that doesn't need the additional
-    // Twitch IRC capabilities.
+    // Giving the bot Twitch IRC capabilities.
 
-    // connection.sendUTF('CAP REQ :twitch.tv/commands twitch.tv/membership twitch.tv/tags');
+    connection.sendUTF('CAP REQ :twitch.tv/commands twitch.tv/membership twitch.tv/tags');
 
     // Authenticate with the Twitch IRC server and then join the channel.
     // If the authentication fails, the server drops the connection.
@@ -94,7 +93,7 @@ client.on('connect', function (connection) {
                                     connection.close();
                                     break;
                                 default:
-                                    ; // Ignore all other Twitch chat messages
+                                    ; // Ignore all other bot commands or Twitch chat messages
                             }
                             break;
                         case 'PING':
