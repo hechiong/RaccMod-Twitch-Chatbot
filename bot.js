@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const pw = 'oauth:30n5wzhagwsujk8r5dj2ysz27afswf';
+const pw = 'oauth:9mzw0f48skunzn5kca1xxe6xanh2u8';
 const WebSocketClient = require('websocket').client;
 
 const client = new WebSocketClient();
@@ -120,6 +120,10 @@ client.on('connect', function (connection) {
 
                                     sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${discordLink}`);
                                     break;
+                                case 'lurk':
+                                    const lurkMsg = `Have a good racclurk, ${parsedMessage.source.nick}. RaccAttack`;
+
+                                    sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${lurkMsg}`)
                                 default:
                                     ; // Ignore all other bot commands or Twitch chat messages
                             }
@@ -478,6 +482,5 @@ function sendRateLimitedUTF(connection, message) {
     if (numMsgsSent < msgsLimit) {
         connection.sendUTF(message);
         numMsgsSent += 1;
-        console.log(numMsgsSent);
     }
 }
