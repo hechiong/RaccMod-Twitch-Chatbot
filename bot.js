@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const pw = 'oauth:473an01uvrbseda81zngfz79yrpg7v';
+const pw = 'oauth:30n5wzhagwsujk8r5dj2ysz27afswf';
 const WebSocketClient = require('websocket').client;
 
 const client = new WebSocketClient();
@@ -7,6 +7,12 @@ const channel = '#trinityc4';  // Replace with your channel.
 const account = 'raccmod';   // Replace with the account the bot runs as
 
 const botCommands = ['commands', 'crk', 'discord'];
+
+// Used for ensuring the bot doesn't exceed the rate limits
+const msgsLimit = 90;  // Actual limit is 100 messages but err on the safe side
+const timeLimit = 1000 * 30;  // Window of time for rate limits is 30 seconds
+let numMsgsSent = 0;
+
 const moveMessage = 'Get up and move, your body will thank you!';
 const defaultMoveInterval = 1000 * 60 * 1; // Set to 1 minute for testing.
 let moveInterval = defaultMoveInterval;
@@ -19,21 +25,18 @@ client.on('connect', function (connection) {
     console.log('WebSocket Client Connected');
 
     // Giving the bot Twitch IRC capabilities.
-    connection.sendUTF('CAP REQ :twitch.tv/commands twitch.tv/membership twitch.tv/tags');
+    sendRateLimitedUTF(connection, 'CAP REQ :twitch.tv/commands twitch.tv/membership twitch.tv/tags');
 
     // Authenticate with the Twitch IRC server and then join the channel.
     // If the authentication fails, the server drops the connection.
-    connection.sendUTF(`PASS ${pw}`);
-    connection.sendUTF(`NICK ${account}`);
+    sendRateLimitedUTF(connection, `PASS ${pw}`);
+    sendRateLimitedUTF(connection, `NICK ${account}`);
 
-    // Make interval object and sendUTF function for tracking number of
-    // messages the bot sends (rate is 100 messages per 30 seconds)
-
-    // Set a timer to post future 'move' messages. This timer can be
-    // reset if the user passes, !move [minutes], in chat.
-    /*let intervalObj = setInterval(() => {
-        connection.sendUTF(`PRIVMSG ${channel} :${moveMessage}`);
-    }, moveInterval);*/
+    // Set a timer to track how many IRC messages
+    // the bot sends in a given window of time.
+    let rateLimitIntervalObj = setInterval(() => {
+        numMsgsSent = 0;
+    }, timeLimit);
 
     connection.on('error', function (error) {
         console.log("Connection Error: " + error.toString());
@@ -44,7 +47,7 @@ client.on('connect', function (connection) {
         console.log(`close description: ${connection.closeDescription}`);
         console.log(`close reason code: ${connection.closeReasonCode}`);
 
-        // clearInterval(intervalObj);
+        clearInterval(rateLimitIntervalObj);
     });
 
     // Process the Twitch IRC message.
@@ -68,7 +71,7 @@ client.on('connect', function (connection) {
                                 case 'move':
                                     if (parsedMessage.command.botCommandParams.length == 0 ||
                                         !isNumeric(parsedMessage.command.botCommandParams[0])) {
-                                        connection.sendUTF(`PRIVMSG ${channel} :
+                                        sendRateLimitedUTF(connection, `PRIVMSG ${channel} :
                                             !${parsedMessage.command.botCommand} needs 1 numeric parameter.`);
                                     } else {
                                         let updateInterval = (parsedMessage.command.botCommandParams[0]) ?
@@ -83,7 +86,7 @@ client.on('connect', function (connection) {
                                                 clearInterval(intervalObj);
                                                 intervalObj = null;
                                                 intervalObj = setInterval(() => {
-                                                    connection.sendUTF(`PRIVMSG ${channel} :${moveMessage}`);
+                                                    sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${moveMessage}`);
                                                 }, moveInterval);
                                             }
                                         }
@@ -91,7 +94,7 @@ client.on('connect', function (connection) {
                                     break;
                                 case 'moveoff':
                                     clearInterval(intervalObj);
-                                    connection.sendUTF(`PART ${channel}`);
+                                    sendRateLimitedUTF(connection, `PART ${channel}`);
                                     connection.close();
                                     break;
                                 */
@@ -102,7 +105,7 @@ client.on('connect', function (connection) {
                                         commandsMsg += ` | !${botCommands[i]}`;
                                     }
 
-                                    connection.sendUTF(`PRIVMSG ${channel} :${commandsMsg}`);
+                                    sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${commandsMsg}`);
                                     break;
                                 case 'crk':
                                     const guild = 'Matcha';
@@ -110,28 +113,28 @@ client.on('connect', function (connection) {
                                     const server = 'Hollyberry';
                                     const crkMsg = `IGN: ${ign} | Guild: ${guild} | Server: ${server}`;
 
-                                    connection.sendUTF(`PRIVMSG ${channel} :${crkMsg}`);
+                                    sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${crkMsg}`);
                                     break;
                                 case 'discord':
                                     const discordLink = 'To be raccmade...';
 
-                                    connection.sendUTF(`PRIVMSG ${channel} :${discordLink}`);
+                                    sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${discordLink}`);
                                     break;
                                 default:
                                     ; // Ignore all other bot commands or Twitch chat messages
                             }
                             break;
                         case 'PING':
-                            connection.sendUTF('PONG ' + parsedMessage.parameters);
+                            sendRateLimitedUTF(connection, 'PONG ' + parsedMessage.parameters);
                             break;
                         case '001':
                             // Successfully logged in, so join the channel.
-                            connection.sendUTF(`JOIN ${channel}`);
+                            sendRateLimitedUTF(connection, `JOIN ${channel}`);
                             break;
                         case 'JOIN':
                             // Send the initial move message. All other move messages are
                             // sent by the timer.
-                            // connection.sendUTF(`PRIVMSG ${channel} :${moveMessage}`);
+                            // sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${moveMessage}`);
                             break;
                         case 'PART':
                             if ('raccmod' === parsedMessage.source.nick) {
@@ -144,10 +147,10 @@ client.on('connect', function (connection) {
                             // The server will close the connection.
                             if ('Login authentication failed' === parsedMessage.parameters) {
                                 console.log(`Authentication failed; left ${channel}`);
-                                connection.sendUTF(`PART ${channel}`);
+                                sendRateLimitedUTF(connection, `PART ${channel}`);
                             } else if ('You don’t have permission to perform that action' === parsedMessage.parameters) {
                                 console.log(`No permission. Check if the access token is still valid. Left ${channel}`);
-                                connection.sendUTF(`PART ${channel}`);
+                                sendRateLimitedUTF(connection, `PART ${channel}`);
                             }
                             break;
                         case 'CLEARCHAT':        // maybe
@@ -467,4 +470,14 @@ function isNumeric(str) {
 
     return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
         !isNaN(parseFloat(str)); // ...and ensure strings of whitespace fail
+}
+
+// Sends an IRC message and increments the number of messages
+// sent in the current rate limit interval given a connection.
+function sendRateLimitedUTF(connection, message) {
+    if (numMsgsSent < msgsLimit) {
+        connection.sendUTF(message);
+        numMsgsSent += 1;
+        console.log(numMsgsSent);
+    }
 }
