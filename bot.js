@@ -6,7 +6,7 @@ const client = new WebSocketClient();
 const channel = '#trinityc4';  // Replace with your channel.
 const account = 'raccmod';   // Replace with the account the bot runs as
 
-const botCommands = ['commands', 'crk', 'discord'];
+const botCommands = ['commands', 'crk', 'discord', 'lurk'];
 
 // Used for ensuring the bot doesn't exceed the rate limits
 const msgsLimit = 90;  // Actual limit is 100 messages but err on the safe side
