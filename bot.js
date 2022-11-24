@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const pw = 'oauth:zskz3psj7ctsbau8j7a7k64qlsm7pq';
+const pw = 'oauth:wxaeol7n9a6ww6bpoyv03nqxi7cw73';
 const WebSocketClient = require('websocket').client;
 
 const client = new WebSocketClient();
@@ -9,7 +9,7 @@ const account = 'raccmod';   // Replace with the account the bot runs as
 const botCommands = ['commands', 'crk', 'discord', 'lurk'];
 
 // Used for ensuring the bot doesn't exceed the rate limits
-const msgsLimit = 90;  // Actual limit is 100 messages but err on the safe side
+const msgsLimit = 95;  // Actual limit is 100 messages but err on the safe side
 const timeLimit = 1000 * 30;  // Window of time for rate limits is 30 seconds
 let numMsgsSent = 0;
 
@@ -129,6 +129,7 @@ client.on('connect', function (connection) {
                                     ; // Ignore all other bot commands or Twitch chat messages
                             }
                             
+                            // Send a chat message to first time or returning chatters
                             if ('1' === parsedMessage.tags['first-msg']) {
                                 const welcomeMsg = `Raccwelcome, ${parsedMessage.source.nick}. RaccAttack`;
 
@@ -177,8 +178,8 @@ client.on('connect', function (connection) {
                         case 'RECONNECT':
                         case 'ROOMSTATE':
                         case 'USERNOTICE':
-                        case 'USERSTATE':        // maybe
-                        case 'WHISPER':          //maybe
+                        case 'USERSTATE':
+                        case 'WHISPER':
                         default:
                             ; // Ignore all other IRC messages.
                     }
@@ -310,8 +311,7 @@ function parseTags(tags) {
                         dict[badgeParts[0]] = badgeParts[1];
                     })
                     dictParsedTags[parsedTag[0]] = dict;
-                }
-                else {
+                } else {
                     dictParsedTags[parsedTag[0]] = null;
                 }
                 break;
@@ -374,10 +374,13 @@ function parseCommand(rawCommandComponent) {
     commandParts = rawCommandComponent.split(' ');
 
     switch (commandParts[0]) {
+        // clearmsg, usernotice, whisper
         case 'JOIN':
         case 'PART':
         case 'NOTICE':
+        case 'USERNOTICE':
         case 'CLEARCHAT':
+        case 'CLEARMSG':
         case 'HOSTTARGET':
         case 'PRIVMSG':
             parsedCommand = {
@@ -415,6 +418,12 @@ function parseCommand(rawCommandComponent) {
             console.log('The Twitch IRC server is about to terminate the connection for maintenance.');
             parsedCommand = {
                 command: commandParts[0]
+            };
+            break;
+        case 'WHISPER':
+            parsedCommand = {
+                command: commandParts[0],
+                'from-user': commandParts[1]
             };
             break;
         case '421':
