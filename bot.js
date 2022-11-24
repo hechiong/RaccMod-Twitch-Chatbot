@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const pw = 'oauth:9mzw0f48skunzn5kca1xxe6xanh2u8';
+const pw = 'oauth:zskz3psj7ctsbau8j7a7k64qlsm7pq';
 const WebSocketClient = require('websocket').client;
 
 const client = new WebSocketClient();
@@ -66,6 +66,7 @@ client.on('connect', function (connection) {
 
                     switch (parsedMessage.command.command) {
                         case 'PRIVMSG':
+                            // to use /me: `PRIVMSG ${channel} :/me <message>`
                             switch (parsedMessage.command.botCommand) {
                                 /*
                                 case 'move':
@@ -123,10 +124,17 @@ client.on('connect', function (connection) {
                                 case 'lurk':
                                     const lurkMsg = `Have a good racclurk, ${parsedMessage.source.nick}. RaccAttack`;
 
-                                    sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${lurkMsg}`)
+                                    sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${lurkMsg}`);
                                 default:
                                     ; // Ignore all other bot commands or Twitch chat messages
                             }
+                            
+                            if ('1' === parsedMessage.tags['first-msg']) {
+                                const welcomeMsg = `Raccwelcome, ${parsedMessage.source.nick}.`;
+
+                                sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${welcomeMsg}`);
+                            }
+
                             break;
                         case 'PING':
                             sendRateLimitedUTF(connection, 'PONG ' + parsedMessage.parameters);
@@ -157,14 +165,14 @@ client.on('connect', function (connection) {
                                 sendRateLimitedUTF(connection, `PART ${channel}`);
                             }
                             break;
-                        case 'CLEARCHAT':        // maybe
-                        case 'CLEARMSG':         // maybe
+                        case 'CLEARCHAT':
+                        case 'CLEARMSG':
                         case 'GLOBALUSERSTATE':
                         case 'HOSTTARGET':
-                        case 'NOTICE':           // maybe
+                        case 'NOTICE':
                         case 'RECONNECT':
-                        case 'ROOMSTATE':        // maybe
-                        case 'USERNOTICE':       // maybe
+                        case 'ROOMSTATE':
+                        case 'USERNOTICE':
                         case 'USERSTATE':        // maybe
                         case 'WHISPER':          //maybe
                         default:
@@ -321,15 +329,14 @@ function parseTags(tags) {
                             textPositions.push({
                                 startPosition: positionParts[0],
                                 endPosition: positionParts[1]
-                            })
+                            });
                         });
 
                         dictEmotes[emoteParts[0]] = textPositions;
                     })
 
                     dictParsedTags[parsedTag[0]] = dictEmotes;
-                }
-                else {
+                } else {
                     dictParsedTags[parsedTag[0]] = null;
                 }
 
@@ -346,8 +353,7 @@ function parseTags(tags) {
 
                 if (tagsToIgnore.hasOwnProperty(parsedTag[0])) {
                     ;
-                }
-                else {
+                } else {
                     dictParsedTags[parsedTag[0]] = tagValue;
                 }
         }
@@ -373,12 +379,12 @@ function parseCommand(rawCommandComponent) {
             parsedCommand = {
                 command: commandParts[0],
                 channel: commandParts[1]
-            }
+            };
             break;
         case 'PING':
             parsedCommand = {
                 command: commandParts[0]
-            }
+            };
             break;
         case 'CAP':
             parsedCommand = {
@@ -386,35 +392,35 @@ function parseCommand(rawCommandComponent) {
                 isCapRequestEnabled: (commandParts[2] === 'ACK') ? true : false,
                 // The parameters part of the messages contains the 
                 // enabled capabilities.
-            }
+            };
             break;
         case 'GLOBALUSERSTATE':  // Included only if you request the /commands capability.
             // But it has no meaning without also including the /tags capability.
             parsedCommand = {
                 command: commandParts[0]
-            }
+            };
             break;
         case 'USERSTATE':   // Included only if you request the /commands capability.
         case 'ROOMSTATE':   // But it has no meaning without also including the /tags capabilities.
             parsedCommand = {
                 command: commandParts[0],
                 channel: commandParts[1]
-            }
+            };
             break;
         case 'RECONNECT':
-            console.log('The Twitch IRC server is about to terminate the connection for maintenance.')
+            console.log('The Twitch IRC server is about to terminate the connection for maintenance.');
             parsedCommand = {
                 command: commandParts[0]
-            }
+            };
             break;
         case '421':
-            console.log(`Unsupported IRC command: ${commandParts[2]}`)
+            console.log(`Unsupported IRC command: ${commandParts[2]}`);
             return null;
         case '001':  // Logged in (successfully authenticated). 
             parsedCommand = {
                 command: commandParts[0],
                 channel: commandParts[1]
-            }
+            };
             break;
         case '002':  // Ignoring all other numeric messages.
         case '003':
@@ -424,7 +430,7 @@ function parseCommand(rawCommandComponent) {
         case '372':
         case '375':
         case '376':
-            console.log(`numeric message: ${commandParts[0]}`)
+            console.log(`numeric message: ${commandParts[0]}`);
             return null;
         default:
             console.log(`\nUnexpected command: ${commandParts[0]}\n`);
@@ -444,14 +450,14 @@ function parseSource(rawSourceComponent) {
         return {
             nick: (sourceParts.length == 2) ? sourceParts[0] : null,
             host: (sourceParts.length == 2) ? sourceParts[1] : sourceParts[0]
-        }
+        };
     }
 }
 
 // Parsing the IRC parameters component if it contains a command (e.g., !dice).
 
 function parseParameters(rawParametersComponent, command) {
-    let idx = 0
+    let idx = 0;
     let commandParts = rawParametersComponent.slice(idx + 1).trim();
     let paramsIdx = commandParts.indexOf(' ');
 
