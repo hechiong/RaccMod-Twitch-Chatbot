@@ -130,9 +130,13 @@ client.on('connect', function (connection) {
                             }
                             
                             if ('1' === parsedMessage.tags['first-msg']) {
-                                const welcomeMsg = `Raccwelcome, ${parsedMessage.source.nick}.`;
+                                const welcomeMsg = `Raccwelcome, ${parsedMessage.source.nick}. RaccAttack`;
 
                                 sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${welcomeMsg}`);
+                            } else if ('1' === parsedMessage.tags['returning-chatter']) {
+                                const welcomeBackMsg = `Raccwelcome raccback, ${parsedMessage.source.nick}. RaccAttack`;
+
+                                sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${welcomeBackMsg}`);
                             }
 
                             break;
