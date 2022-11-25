@@ -130,11 +130,11 @@ client.on('connect', function (connection) {
                             }
                             
                             // Send a chat message to first time or returning chatters
-                            if ('1' === parsedMessage.tags['first-msg']) {
+                            if (parsedMessage.tags['first-msg'] === '1') {
                                 const welcomeMsg = `Raccwelcome, ${parsedMessage.tags['display-name']}. RaccAttack`;
 
                                 sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${welcomeMsg}`);
-                            } else if ('1' === parsedMessage.tags['returning-chatter']) {
+                            } else if (parsedMessage.tags['returning-chatter'] === '1') {
                                 const welcomeBackMsg = `Raccwelcome raccback, ${parsedMessage.tags['display-name']}. RaccAttack`;
 
                                 sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${welcomeBackMsg}`);
@@ -154,7 +154,7 @@ client.on('connect', function (connection) {
                             // sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${moveMessage}`);
                             break;
                         case 'PART':
-                            if ('raccmod' === parsedMessage.source.nick) {
+                            if (parsedMessage.source.nick === 'raccmod') {
                                 console.log('The channel must have banned (/ban) the bot.');
                                 connection.close();
                             }
@@ -162,10 +162,10 @@ client.on('connect', function (connection) {
                         case 'NOTICE':
                             // If the authentication failed, leave the channel.
                             // The server will close the connection.
-                            if ('Login authentication failed' === parsedMessage.parameters) {
+                            if (parsedMessage.parameters === 'Login authentication failed') {
                                 console.log(`Authentication failed; left ${channel}`);
                                 sendRateLimitedUTF(connection, `PART ${channel}`);
-                            } else if ('You don’t have permission to perform that action' === parsedMessage.parameters) {
+                            } else if (parsedMessage.parameters === 'You don’t have permission to perform that action') {
                                 console.log(`No permission. Check if the access token is still valid. Left ${channel}`);
                                 sendRateLimitedUTF(connection, `PART ${channel}`);
                             }
@@ -265,7 +265,7 @@ function parseMessage(message) {
     // Get the command component of the IRC message.
 
     let endIdx = message.indexOf(':', idx);  // Looking for the parameters part of the message.
-    if (-1 == endIdx) {                      // But not all messages include the parameters part.
+    if (endIdx == -1) {                      // But not all messages include the parameters part.
         endIdx = message.length;
     }
 
@@ -285,10 +285,10 @@ function parseMessage(message) {
     // Only parse the rest of the components if it's a command
     // we care about; we ignore some messages.
 
-    if (null == parsedMessage.command) {  // Is null if it's a message we don't care about.
+    if (parsedMessage.command == null) {  // Is null if it's a message we don't care about.
         return null;
     } else {
-        if (null != rawTagsComponent) {  // The IRC message contains tags.
+        if (rawTagsComponent != null) {  // The IRC message contains tags.
             parsedMessage.tags = parseTags(rawTagsComponent);
         }
 
@@ -481,7 +481,7 @@ function parseCommand(rawCommandComponent) {
 // Parses the source (nick and host) components of the IRC message.
 
 function parseSource(rawSourceComponent) {
-    if (null == rawSourceComponent) {  // Not all messages contain a source
+    if (rawSourceComponent == null) {  // Not all messages contain a source
         return null;
     } else {
         let sourceParts = rawSourceComponent.split('!');
@@ -499,7 +499,7 @@ function parseParameters(rawParametersComponent, command) {
     let commandParts = rawParametersComponent.slice(idx + 1).trim();
     let paramsIdx = commandParts.indexOf(' ');
 
-    if (-1 == paramsIdx) { // no parameters
+    if (paramsIdx == -1) { // no parameters
         command.botCommand = commandParts.slice(0);
         command.botCommandParams = [];
     } else {
@@ -570,7 +570,7 @@ function convertDuration(duration) {
 
 // Returns whether the string is a valid number.
 function isNumeric(str) {
-    if ('string' != typeof str) {  // only process strings
+    if (typeof str != 'string') {  // only process strings
         return false;
     }
 
