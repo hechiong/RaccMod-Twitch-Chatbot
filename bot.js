@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const pw = 'oauth:wxaeol7n9a6ww6bpoyv03nqxi7cw73';
+const pw = 'oauth:0sw2yhz1x91097yzk93z6p6rfcv1wn';
 const WebSocketClient = require('websocket').client;
 
 const client = new WebSocketClient();
@@ -171,6 +171,22 @@ client.on('connect', function (connection) {
                             }
                             break;
                         case 'CLEARCHAT':
+                            if (parsedMessage.tags['target-user-id']) {
+                                if (parsedMessage.tags['ban-duration']) {
+                                    // if the user was timed out
+                                    const banDuration = parsedMessage.tags['ban-duration'];
+                                    const timeoutMsg = `${parsedMessage.source.nick} has been raccsentenced to ${banDuration} raccseconds in raccprison. RaccAttack`;
+                                    sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${timeoutMsg}`);
+                                } else {
+                                    // if the user was banned
+                                    const banMsg = `${parsedMessage.source.nick} has been raccbanished. RaccAttack`;
+                                    sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${banMsg}`);
+                                }
+                            } else {
+                                // if the chat was cleared (for non-moderator viewers)
+                                const clearChatMsg =  'Raccnothing to see here. RaccAttack';
+                                sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${clearChatMsg}`);
+                            }
                         case 'CLEARMSG':
                         case 'GLOBALUSERSTATE':
                         case 'HOSTTARGET':
