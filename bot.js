@@ -122,7 +122,7 @@ client.on('connect', function (connection) {
                                     sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${discordLink}`);
                                     break;
                                 case 'lurk':
-                                    const lurkMsg = `Have a good racclurk, ${parsedMessage.source.nick}. RaccAttack`;
+                                    const lurkMsg = `Have a good racclurk, ${parsedMessage.tags['display-name']}. RaccAttack`;
 
                                     sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${lurkMsg}`);
                                 default:
@@ -131,11 +131,11 @@ client.on('connect', function (connection) {
                             
                             // Send a chat message to first time or returning chatters
                             if ('1' === parsedMessage.tags['first-msg']) {
-                                const welcomeMsg = `Raccwelcome, ${parsedMessage.source.nick}. RaccAttack`;
+                                const welcomeMsg = `Raccwelcome, ${parsedMessage.tags['display-name']}. RaccAttack`;
 
                                 sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${welcomeMsg}`);
                             } else if ('1' === parsedMessage.tags['returning-chatter']) {
-                                const welcomeBackMsg = `Raccwelcome raccback, ${parsedMessage.source.nick}. RaccAttack`;
+                                const welcomeBackMsg = `Raccwelcome raccback, ${parsedMessage.tags['display-name']}. RaccAttack`;
 
                                 sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${welcomeBackMsg}`);
                             }
@@ -172,19 +172,24 @@ client.on('connect', function (connection) {
                             break;
                         case 'CLEARCHAT':
                             if (parsedMessage.tags['target-user-id']) {
+                                const username = capitalize(parsedMessage.parameters);
+
                                 if (parsedMessage.tags['ban-duration']) {
                                     // if the user was timed out
                                     const banDuration = parsedMessage.tags['ban-duration'];
-                                    const timeoutMsg = `${parsedMessage.source.nick} has been raccsentenced to ${banDuration} raccseconds in raccprison. RaccAttack`;
+                                    const timeoutMsg = `${username} has been raccsentenced to ${banDuration} raccseconds in raccprison. RaccAttack`;
+                                    
                                     sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${timeoutMsg}`);
                                 } else {
                                     // if the user was banned
-                                    const banMsg = `${parsedMessage.source.nick} has been raccbanished. RaccAttack`;
+                                    const banMsg = `${username} has been raccbanished. RaccAttack`;
+                                    
                                     sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${banMsg}`);
                                 }
                             } else {
                                 // if the chat was cleared (for non-moderator viewers)
                                 const clearChatMsg =  'Raccnothing to see here. RaccAttack';
+
                                 sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${clearChatMsg}`);
                             }
                         case 'CLEARMSG':
@@ -499,6 +504,15 @@ function parseParameters(rawParametersComponent, command) {
     }
 
     return command;
+}
+
+// Returns the capitalized version of a non-empty string.
+function capitalize(str) {
+    if (str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    return str;
 }
 
 // Returns whether the string is a valid number
