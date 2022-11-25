@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const pw = 'oauth:mmr6akg70hunv9k8bk45g7r178tbv8';
+const pw = 'oauth:rww8cquvqr0x9j7u3sjao5z7xagqxl';
 const WebSocketClient = require('websocket').client;
 
 const client = new WebSocketClient();
@@ -522,47 +522,53 @@ function capitalize(str) {
 // Converts the unit of some duration from seconds to
 // denominatons of days, hours, minutes, and seconds.
 function convertDuration(duration) {
-    if (!isNumeric(duration)) { // only process numbers
+    if (!isNumeric(duration) || duration <= 0) { // only process positive numbers
         return duration;
     }
 
-    const numSecInDay = 86400;
-    const numSecInHour = 3600;
-    const numSecInMinute = 60;
-    let seconds = parseInt(duration);
+    const conversionFactors = [86400, 3600, 60, 1];
+    const denoms = [0, 0, 0, 0];
+    const units = ['raccday', 'racchour', 'raccminute', 'raccsecond'];
+
     let convertedDuration = '';
+    let lastPositiveDenomIdx = -1;
+    let numPositiveDenoms = 0;
+    let seconds = parseInt(duration);
 
-    const days = Math.floor(seconds / numSecInDay);
-    seconds %= numSecInDay;
-
-    const hours = Math.floor(seconds / numSecInHour);
-    seconds %= numSecInHour;
-
-    const minutes = Math.floor(seconds / numSecInMinute);
-    seconds %= numSecInMinute;
-
-    if (days > 1) {
-        convertedDuration += `${days} raccdays`;
-    } else if (days == 1) {
-        convertedDuration += `${days} raccday`;
+    for (let i = 0; i < units.length; i++) {
+        denoms[i] = Math.floor(seconds / conversionFactors[i]);
+        if (denoms[i] > 0) {
+            lastPositiveDenomIdx = i;
+            numPositiveDenoms += 1;
+        }
+        seconds %= conversionFactors[i];
     }
-    
-    if (hours > 1) {
-        convertedDuration += `, ${hours} racchours`;
-    } else if (hours == 1) {
-        convertedDuration += `, ${hours} racchour`;
-    }
-    
-    if (minutes > 1) {
-        convertedDuration += `, ${minutes} raccminutes`;
-    } else if (minutes == 1) {
-        convertedDuration += `, ${minutes} raccminute`;
-    }
-    
-    if (seconds > 1) {
-        convertedDuration += `, ${seconds} raccseconds`;
-    } else if (seconds == 1) {
-        convertedDuration += `, ${seconds} raccsecond`;
+
+    if (numPositiveDenoms == 1) {
+        convertedDuration = `${denoms[lastPositiveDenomIdx]} ${units[lastPositiveDenomIdx]}`;
+        if (denoms[lastPositiveDenomIdx] > 1) {
+            convertedDuration += 's';
+        }
+    } else {
+        for (let i = 0; i <= lastPositiveDenomIdx; i++) {
+            if (denoms[i] > 0) {
+                if (i == lastPositiveDenomIdx) {
+                    convertedDuration += 'and ';
+                }
+
+                convertedDuration += `${denoms[i]} ${units[i]}`;
+                if (denoms[i] > 1) {
+                    convertedDuration += 's';
+                }
+
+                if (i < lastPositiveDenomIdx) {
+                    if (numPositiveDenoms > 2) {
+                        convertedDuration += ',';
+                    }
+                    convertedDuration += ' ';
+                }
+            }
+        }
     }
 
     return convertedDuration;
