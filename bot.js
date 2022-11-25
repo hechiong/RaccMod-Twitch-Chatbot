@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const pw = 'oauth:0sw2yhz1x91097yzk93z6p6rfcv1wn';
+const pw = 'oauth:mmr6akg70hunv9k8bk45g7r178tbv8';
 const WebSocketClient = require('websocket').client;
 
 const client = new WebSocketClient();
@@ -176,8 +176,8 @@ client.on('connect', function (connection) {
 
                                 if (parsedMessage.tags['ban-duration']) {
                                     // if the user was timed out
-                                    const banDuration = parsedMessage.tags['ban-duration'];
-                                    const timeoutMsg = `${username} has been raccsentenced to ${banDuration} raccseconds in raccprison. RaccAttack`;
+                                    const banDuration = convertDuration(parsedMessage.tags['ban-duration']);
+                                    const timeoutMsg = `${username} has been raccsentenced to ${banDuration} in raccprison. RaccAttack`;
                                     
                                     sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${timeoutMsg}`);
                                 } else {
@@ -519,9 +519,58 @@ function capitalize(str) {
     return str;
 }
 
-// Returns whether the string is a valid number
+// Converts the unit of some duration from seconds to
+// denominatons of days, hours, minutes, and seconds.
+function convertDuration(duration) {
+    if (!isNumeric(duration)) { // only process numbers
+        return duration;
+    }
+
+    const numSecInDay = 86400;
+    const numSecInHour = 3600;
+    const numSecInMinute = 60;
+    let seconds = parseInt(duration);
+    let convertedDuration = '';
+
+    const days = Math.floor(seconds / numSecInDay);
+    seconds %= numSecInDay;
+
+    const hours = Math.floor(seconds / numSecInHour);
+    seconds %= numSecInHour;
+
+    const minutes = Math.floor(seconds / numSecInMinute);
+    seconds %= numSecInMinute;
+
+    if (days > 1) {
+        convertedDuration += `${days} raccdays`;
+    } else if (days == 1) {
+        convertedDuration += `${days} raccday`;
+    }
+    
+    if (hours > 1) {
+        convertedDuration += `, ${hours} racchours`;
+    } else if (hours == 1) {
+        convertedDuration += `, ${hours} racchour`;
+    }
+    
+    if (minutes > 1) {
+        convertedDuration += `, ${minutes} raccminutes`;
+    } else if (minutes == 1) {
+        convertedDuration += `, ${minutes} raccminute`;
+    }
+    
+    if (seconds > 1) {
+        convertedDuration += `, ${seconds} raccseconds`;
+    } else if (seconds == 1) {
+        convertedDuration += `, ${seconds} raccsecond`;
+    }
+
+    return convertedDuration;
+}
+
+// Returns whether the string is a valid number.
 function isNumeric(str) {
-    if (typeof str != "string") {  // only process strings
+    if ('string' != typeof str) {  // only process strings
         return false;
     }
 
