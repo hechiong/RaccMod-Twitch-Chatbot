@@ -188,11 +188,15 @@ client.on('connect', function (connection) {
                                 }
                             } else {
                                 // if the chat was cleared (for non-moderator viewers)
-                                const clearChatMsg =  'Raccnothing to see here. RaccAttack';
+                                const clearChatMsg = 'Raccnothing to see here. RaccAttack';
 
                                 sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${clearChatMsg}`);
                             }
+                            break;
                         case 'CLEARMSG':
+                            const clearMsgMsg = `Raccwatch what you raccsay, ${capitalize(parsedMessage.tags.login)}. RaccAttack`;
+
+                            sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${clearMsgMsg}`);
                         case 'GLOBALUSERSTATE':
                         case 'HOSTTARGET':
                         case 'NOTICE':
