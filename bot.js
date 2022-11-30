@@ -118,7 +118,7 @@ client.on('connect', function (connection) {
                                     sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${crkMsg}`);
                                     break;
                                 case 'discord':
-                                    const discordLink = 'To be raccmade...';
+                                    const discordLink = 'https://discord.gg/D4TZexcR';
 
                                     sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${discordLink}`);
                                     break;
