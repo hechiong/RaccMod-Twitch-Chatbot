@@ -1,10 +1,11 @@
 #!/usr/bin/env node
-const pw = 'oauth:rww8cquvqr0x9j7u3sjao5z7xagqxl';
-const WebSocketClient = require('websocket').client;
+import token from './config.json';
+import { client as WebSocketClient } from 'websocket';
 
 const client = new WebSocketClient();
 const channel = '#trinityc4';  // Replace with your channel.
 const account = 'raccmod';   // Replace with the account the bot runs as
+const password = 'oauth:' + token;
 
 const botCommands = ['commands', 'crk', 'discord', 'lurk'];
 
@@ -29,7 +30,7 @@ client.on('connect', function (connection) {
 
     // Authenticate with the Twitch IRC server and then join the channel.
     // If the authentication fails, the server drops the connection.
-    sendRateLimitedUTF(connection, `PASS ${pw}`);
+    sendRateLimitedUTF(connection, `PASS ${password}`);
     sendRateLimitedUTF(connection, `NICK ${account}`);
 
     // Set a timer to track how many IRC messages
