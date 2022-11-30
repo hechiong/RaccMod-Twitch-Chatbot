@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import token from './config.json';
-import { client as WebSocketClient } from 'websocket';
+const { token } = require('./config.json');
+const WebSocketClient = require('websocket').client;
 
 const client = new WebSocketClient();
 const channel = '#trinityc4';  // Replace with your channel.
