@@ -68,6 +68,16 @@ client.on('connect', function (connection) {
                     switch (parsedMessage.command.command) {
                         case 'PRIVMSG':
                             // to use /me: `PRIVMSG ${channel} :/me <message>`
+
+                            // Set up the start of a PRIVMSG message
+                            const parentMsgId = parsedMessage.tags.id;
+                            const replyTag = `@reply-parent-msg-id=${parentMsgId}`;
+                            const commandComponent = `PRIVMSG ${channel}`;
+                            const msgStarter = `${replyTag} ${commandComponent}`;
+
+                            // Handy variables to use for chat commands
+                            const displayName = parsedMessage.tags['display-name'];
+
                             switch (parsedMessage.command.botCommand) {
                                 /*
                                 case 'move':
@@ -107,7 +117,7 @@ client.on('connect', function (connection) {
                                         commandsMsg += ` | !${botCommands[i]}`;
                                     }
 
-                                    sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${commandsMsg}`);
+                                    sendRateLimitedUTF(connection, `${msgStarter} :${commandsMsg}`);
                                     break;
                                 case 'crk':
                                     const guild = 'Matcha';
@@ -115,17 +125,17 @@ client.on('connect', function (connection) {
                                     const server = 'Hollyberry';
                                     const crkMsg = `IGN: ${ign} | Guild: ${guild} | Server: ${server}`;
 
-                                    sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${crkMsg}`);
+                                    sendRateLimitedUTF(connection, `${msgStarter} :${crkMsg}`);
                                     break;
                                 case 'discord':
                                     const discordLink = 'https://discord.gg/D4TZexcR';
 
-                                    sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${discordLink}`);
+                                    sendRateLimitedUTF(connection, `${msgStarter} :${discordLink}`);
                                     break;
                                 case 'lurk':
-                                    const lurkMsg = `Have a good racclurk, ${parsedMessage.tags['display-name']}. RaccAttack`;
+                                    const lurkMsg = `Have a good racclurk, ${displayName}. RaccAttack`;
 
-                                    sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${lurkMsg}`);
+                                    sendRateLimitedUTF(connection, `${msgStarter} :${lurkMsg}`);
                                 default:
                                     ; // Ignore all other bot commands or Twitch chat messages
                             }
@@ -134,11 +144,11 @@ client.on('connect', function (connection) {
                             if (parsedMessage.tags['first-msg'] === '1') {
                                 const welcomeMsg = `Raccwelcome, ${parsedMessage.tags['display-name']}. RaccAttack`;
 
-                                sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${welcomeMsg}`);
+                                sendRateLimitedUTF(connection, `${msgStarter} :${welcomeMsg}`);
                             } else if (parsedMessage.tags['returning-chatter'] === '1') {
                                 const welcomeBackMsg = `Raccwelcome raccback, ${parsedMessage.tags['display-name']}. RaccAttack`;
 
-                                sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${welcomeBackMsg}`);
+                                sendRateLimitedUTF(connection, `${msgStarter} :${welcomeBackMsg}`);
                             }
 
                             break;
