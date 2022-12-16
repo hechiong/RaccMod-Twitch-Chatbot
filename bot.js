@@ -128,7 +128,7 @@ client.on('connect', function (connection) {
                                     sendRateLimitedUTF(connection, `${msgStarter} :${crkMsg}`);
                                     break;
                                 case 'discord':
-                                    const discordLink = 'https://discord.gg/D4TZexcR';
+                                    const discordLink = 'https://discord.gg/zCMQwUUS';
 
                                     sendRateLimitedUTF(connection, `${msgStarter} :${discordLink}`);
                                     break;
