@@ -1,13 +1,13 @@
 #!/usr/bin/env node
-const { token } = require('./config.json');
+const { channel, discord, token } = require('./config.json');
+const { gameCmd, guild, server, ign } = require('./game-info.json');
 const WebSocketClient = require('websocket').client;
 
 const client = new WebSocketClient();
-const channel = '#trinityc4';  // Replace with your channel.
 const account = 'raccmod';   // Replace with the account the bot runs as
 const password = 'oauth:' + token;
 
-const botCommands = ['commands', 'crk', 'discord', 'lurk'];
+const botCommands = ['commands', gameCmd, 'discord', 'lurk'];
 
 // Used for ensuring the bot doesn't exceed the rate limits
 const msgsLimit = 95;  // Actual limit is 100 messages but err on the safe side
@@ -119,18 +119,13 @@ client.on('connect', function (connection) {
 
                                     sendRateLimitedUTF(connection, `${msgStarter} :${commandsMsg}`);
                                     break;
-                                case 'crk':
-                                    const guild = 'Matcha';
-                                    const ign = 'DivinityC';
-                                    const server = 'Hollyberry';
-                                    const crkMsg = `IGN: ${ign} | Guild: ${guild} | Server: ${server}`;
+                                case gameCmd:
+                                    const gameMsg = `IGN: ${ign} | Guild: ${guild} | Server: ${server}`;
 
-                                    sendRateLimitedUTF(connection, `${msgStarter} :${crkMsg}`);
+                                    sendRateLimitedUTF(connection, `${msgStarter} :${gameMsg}`);
                                     break;
                                 case 'discord':
-                                    const discordLink = 'https://discord.gg/zCMQwUUS';
-
-                                    sendRateLimitedUTF(connection, `${msgStarter} :${discordLink}`);
+                                    sendRateLimitedUTF(connection, `${msgStarter} :${discord}`);
                                     break;
                                 case 'lurk':
                                     const lurkMsg = `Have a good racclurk, ${displayName}. RaccAttack`;
