@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const { channel, discord, token } = require('./config.json');
+const { channel, discord, token, youtube } = require('./config.json');
 const { gameCmd, guild, server, ign } = require('./game-info.json');
 const WebSocketClient = require('websocket').client;
 
@@ -7,7 +7,7 @@ const client = new WebSocketClient();
 const account = 'raccmod';   // Replace with the account the bot runs as
 const password = 'oauth:' + token;
 
-const botCommands = ['commands', gameCmd, 'discord', 'lurk'];
+const botCommands = ['commands', gameCmd, 'discord', 'lurk', 'youtube'];
 
 // Used for ensuring the bot doesn't exceed the rate limits
 const msgsLimit = 95;  // Actual limit is 100 messages but err on the safe side
@@ -131,6 +131,9 @@ client.on('connect', function (connection) {
                                     const lurkMsg = `Have a good racclurk, ${displayName}. RaccAttack`;
 
                                     sendRateLimitedUTF(connection, `${msgStarter} :${lurkMsg}`);
+                                case 'youtube':
+                                    sendRateLimitedUTF(connection, `${msgStarter} :${youtube}`);
+                                    break;
                                 default:
                                     ; // Ignore all other bot commands or Twitch chat messages
                             }
