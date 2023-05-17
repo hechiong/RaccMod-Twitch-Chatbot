@@ -131,6 +131,7 @@ client.on('connect', function (connection) {
                                     const lurkMsg = `Have a good racclurk, ${displayName}. RaccAttack`;
 
                                     sendRateLimitedUTF(connection, `${msgStarter} :${lurkMsg}`);
+                                    break;
                                 case 'youtube':
                                     sendRateLimitedUTF(connection, `${msgStarter} :${youtube}`);
                                     break;
