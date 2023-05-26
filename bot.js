@@ -8,6 +8,10 @@ const account = 'raccmod';   // Replace with the account the bot runs as
 const password = 'oauth:' + token;
 
 const botCommands = ['commands', gameCmd, 'discord', 'lurk', 'youtube'];
+const raccEmotes = ['Arrive', 'Attack', 'Business', 'Chilling', 'Cozy',
+                       'Hide', 'Jam', 'Jump', 'Leave', 'Munch', 'Pray', 'Roll',
+                       'Sad', 'Slide', 'Sleep', 'Sniff', 'Spin', 'Sus', 'Sweep',
+                       'Tap', 'Yoink']
 
 // Used for ensuring the bot doesn't exceed the rate limits
 const msgsLimit = 95;  // Actual limit is 100 messages but err on the safe side
@@ -119,6 +123,15 @@ client.on('connect', function (connection) {
 
                                     sendRateLimitedUTF(connection, `${msgStarter} :${commandsMsg}`);
                                     break;
+                                case 'emotes':
+                                    let emotesMsg = `racc${raccEmotes[0]}`;
+
+                                    for (let i = 1; i < raccEmotes.length; i++) {
+                                        emotesMsg += ` | !${raccEmotes[i]}`;
+                                    }
+
+                                    sendRateLimitedUTF(connection, `${msgStarter} :${emotesMsg}`);
+                                    break;
                                 case gameCmd:
                                     const gameMsg = `IGN: ${ign} | Guild: ${guild} | Server: ${server}`;
 
@@ -141,11 +154,11 @@ client.on('connect', function (connection) {
                             
                             // Send a chat message to first time or returning chatters
                             if (parsedMessage.tags['first-msg'] === '1') {
-                                const welcomeMsg = `Raccwelcome, ${parsedMessage.tags['display-name']}. RaccAttack`;
+                                const welcomeMsg = `Raccwelcome, ${displayName}. RaccAttack`;
 
                                 sendRateLimitedUTF(connection, `${msgStarter} :${welcomeMsg}`);
                             } else if (parsedMessage.tags['returning-chatter'] === '1') {
-                                const welcomeBackMsg = `Raccwelcome raccback, ${parsedMessage.tags['display-name']}. RaccAttack`;
+                                const welcomeBackMsg = `Raccwelcome raccback, ${displayName}. RaccAttack`;
 
                                 sendRateLimitedUTF(connection, `${msgStarter} :${welcomeBackMsg}`);
                             }
