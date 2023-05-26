@@ -127,7 +127,7 @@ client.on('connect', function (connection) {
                                     let emotesMsg = `racc${raccEmotes[0]}`;
 
                                     for (let i = 1; i < raccEmotes.length; i++) {
-                                        emotesMsg += ` | !${raccEmotes[i]}`;
+                                        emotesMsg += ` | racc${raccEmotes[i]}`;
                                     }
 
                                     sendRateLimitedUTF(connection, `${msgStarter} :${emotesMsg}`);
