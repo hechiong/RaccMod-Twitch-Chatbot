@@ -12,7 +12,7 @@ const emotes = ['KEKW', 'KEKOMI']
 const raccEmotes = ['Arrive', 'Attack', 'Bark', 'Business', 'Chilling', 'Cozy',
                        'Hide', 'Jam', 'Jump', 'Leave', 'Munch', 'Oko', 'Pray',
                        'Roll','Sad', 'Slide', 'Sleep', 'Sniff', 'Spin', 'Sus',
-                       'Sweep','Tap', 'Yoink']
+                       'Sweep','Tap', 'Tired', 'Yoink']
 
 // Used for ensuring the bot doesn't exceed the rate limits
 const msgsLimit = 95;  // Actual limit is 100 messages but err on the safe side
