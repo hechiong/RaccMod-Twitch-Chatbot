@@ -8,6 +8,7 @@ const account = 'raccmod';   // Replace with the account the bot runs as
 const password = 'oauth:' + token;
 
 const botCommands = ['commands', gameCmd, 'discord', 'emotes', 'lurk', 'youtube'];
+const emotes = ['KEK', 'KEKOMI']
 const raccEmotes = ['Arrive', 'Attack', 'Bark', 'Business', 'Chilling', 'Cozy',
                        'Hide', 'Jam', 'Jump', 'Leave', 'Munch', 'Oko', 'Pray',
                        'Roll','Sad', 'Slide', 'Sleep', 'Sniff', 'Spin', 'Sus',
@@ -128,6 +129,10 @@ client.on('connect', function (connection) {
 
                                     for (let i = 1; i < raccEmotes.length; i++) {
                                         emotesMsg += ` racc${raccEmotes[i]}`;
+                                    }
+                                    
+                                    for (let i = 0; i < emotes.length; i++) {
+                                        emotesMsg += ` ${emotes[i]}`;
                                     }
 
                                     sendRateLimitedUTF(connection, `${msgStarter} :${emotesMsg}`);
