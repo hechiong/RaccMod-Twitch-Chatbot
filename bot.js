@@ -8,7 +8,7 @@ const account = 'raccmod';   // Replace with the account the bot runs as
 const password = 'oauth:' + token;
 
 const botCommands = ['commands', gameCmd, 'discord', 'emotes', 'lurk', 'youtube'];
-const emotes = ['KEKW', 'KEKOMI']
+const emotes = ['KEKW', 'KEKOMI', 'GordonRizz', 'catKISS', 'CATBEDOINGTHELAUNDRY']
 const raccEmotes = ['Arrive', 'Attack', 'Bark', 'Business', 'Chilling', 'Cozy',
                        'Hide', 'Jam', 'Jump', 'Leave', 'Munch', 'Oko', 'Pray',
                        'Roll','Sad', 'Slide', 'Sleep', 'Sniff', 'Spin', 'Sus',
