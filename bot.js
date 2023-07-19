@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const { channel, discord, token, youtube } = require('./config.json');
 const { gameCmd, guild, server, ign } = require('./game-info.json');
+const { emotes, raccEmotes } = require('./emotes.json');
 const WebSocketClient = require('websocket').client;
 const { getAudioDurationInSeconds } = require('get-audio-duration');
 const cmd = require('node-cmd');
@@ -9,8 +10,8 @@ const fs = require('fs');
 const musicDir = "music";
 let audioFiles = fs.readdirSync(`${musicDir}/`);
 audioFiles = shuffle(audioFiles);
-const prevAudioFile = audioFiles[0];
-const currAudioFile = "";
+let prevAudioFile = audioFiles[0];
+let currAudioFile = "";
 
 playAudioFile(prevAudioFile);
 for (let i = 1; i < audioFiles.length; i++) {
@@ -26,12 +27,6 @@ const account = 'raccmod';   // Replace with the account the bot runs as
 const password = 'oauth:' + token;
 
 const botCommands = ['commands', gameCmd, 'discord', 'emotes', 'lurk', 'youtube'];
-const emotes = ['HUH', 'ICANT', 'KEKW', 'KEKOMI', 'GordonRizz', 'catKISS',
-                    'CATBEDOINGTHELAUNDRY']
-const raccEmotes = ['Arrive', 'Attack', 'Bark', 'Business', 'Chilling', 'Cozy',
-                       'Hide', 'Jam', 'Jump', 'Leave', 'Munch', 'Oko', 'Pray',
-                       'Roll','Sad', 'Slide', 'Sleep', 'Sniff', 'Spin', 'Sus',
-                       'Sweep','Tap', 'Tired', 'Yoink']
 
 // Used for ensuring the bot doesn't exceed the rate limits
 const msgsLimit = 95;  // Actual limit is 100 messages but err on the safe side
