@@ -2,13 +2,32 @@
 const { channel, discord, token, youtube } = require('./config.json');
 const { gameCmd, guild, server, ign } = require('./game-info.json');
 const WebSocketClient = require('websocket').client;
+const { getAudioDurationInSeconds } = require('get-audio-duration');
+const cmd = require('node-cmd');
+const fs = require('fs');
+
+const musicDir = "music";
+let audioFiles = fs.readdirSync(`${musicDir}/`);
+audioFiles = shuffle(audioFiles);
+const prevAudioFile = audioFiles[0];
+const currAudioFile = "";
+
+playAudioFile(prevAudioFile);
+for (let i = 1; i < audioFiles.length; i++) {
+    prevAudioFile = audioFiles[i - 1];
+    currAudioFile = audioFiles[i];
+    getAudioDurationInSeconds(`${musicDir}/${prevAudioFile}`).then((duration) => {
+        setTimeout(() => playAudioFile(currAudioFile), (duration + 3) * 1000);
+    });
+}
 
 const client = new WebSocketClient();
 const account = 'raccmod';   // Replace with the account the bot runs as
 const password = 'oauth:' + token;
 
 const botCommands = ['commands', gameCmd, 'discord', 'emotes', 'lurk', 'youtube'];
-const emotes = ['KEKW', 'KEKOMI', 'GordonRizz', 'catKISS', 'CATBEDOINGTHELAUNDRY']
+const emotes = ['HUH', 'ICANT', 'KEKW', 'KEKOMI', 'GordonRizz', 'catKISS',
+                    'CATBEDOINGTHELAUNDRY']
 const raccEmotes = ['Arrive', 'Attack', 'Bark', 'Business', 'Chilling', 'Cozy',
                        'Hide', 'Jam', 'Jump', 'Leave', 'Munch', 'Oko', 'Pray',
                        'Roll','Sad', 'Slide', 'Sleep', 'Sniff', 'Spin', 'Sus',
@@ -420,7 +439,6 @@ function parseTags(tags) {
 }
 
 // Parses the command component of the IRC message.
-
 function parseCommand(rawCommandComponent) {
 
     let parsedCommand = null;
@@ -507,7 +525,6 @@ function parseCommand(rawCommandComponent) {
 }
 
 // Parses the source (nick and host) components of the IRC message.
-
 function parseSource(rawSourceComponent) {
     if (rawSourceComponent == null) {  // Not all messages contain a source
         return null;
@@ -521,7 +538,6 @@ function parseSource(rawSourceComponent) {
 }
 
 // Parsing the IRC parameters component if it contains a command (e.g., !dice).
-
 function parseParameters(rawParametersComponent, command) {
     let idx = 0;
     let commandParts = rawParametersComponent.slice(idx + 1).trim();
@@ -550,7 +566,8 @@ function capitalize(str) {
 // Converts the unit of some duration from seconds to
 // denominatons of days, hours, minutes, and seconds.
 function convertDuration(duration) {
-    if (!isNumeric(duration) || duration <= 0) { // only process positive numbers
+    if (isNaN(duration) || (typeof duration == 'string' && parseInt(duration) <= 0)
+        || (typeof str == 'number' && duration <= 0)) {
         return duration;
     }
 
@@ -602,14 +619,13 @@ function convertDuration(duration) {
     return convertedDuration;
 }
 
-// Returns whether the string is a valid number.
-function isNumeric(str) {
-    if (typeof str != 'string') {  // only process strings
-        return false;
-    }
-
-    return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
-        !isNaN(parseFloat(str)); // ...and ensure strings of whitespace fail
+// Plays the audio file
+function playAudioFile(audioFile) {
+    cmd.run(`powershell -c (New-Object Media.SoundPlayer '${musicDir}/${audioFile}').PlaySync();`,
+        function (err, data, stderr) {
+            console.log(`${audioFile.substring(0, audioFile.length - 4)}: done`)
+        }
+    );
 }
 
 // Sends an IRC message and increments the number of messages
@@ -619,4 +635,13 @@ function sendRateLimitedUTF(connection, message) {
         connection.sendUTF(message);
         numMsgsSent += 1;
     }
+}
+
+// Returns a shuffled array using the Fisher-Yates algorithm
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
 }
