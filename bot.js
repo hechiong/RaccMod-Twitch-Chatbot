@@ -7,26 +7,18 @@ const { getAudioDurationInSeconds } = require('get-audio-duration');
 const cmd = require('node-cmd');
 const fs = require('fs');
 
+// Play music
 const musicDir = "music";
 let audioFiles = fs.readdirSync(`${musicDir}/`);
+let audioFile = "";
 audioFiles = shuffle(audioFiles);
-let prevAudioFile = audioFiles[0];
-let currAudioFile = "";
-
-playAudioFile(prevAudioFile);
-for (let i = 1; i < audioFiles.length; i++) {
-    prevAudioFile = audioFiles[i - 1];
-    currAudioFile = audioFiles[i];
-    getAudioDurationInSeconds(`${musicDir}/${prevAudioFile}`).then((duration) => {
-        setTimeout(() => playAudioFile(currAudioFile), (duration + 3) * 1000);
-    });
-}
+playAudioFile(audioFiles, 0);
 
 const client = new WebSocketClient();
 const account = 'raccmod';   // Replace with the account the bot runs as
 const password = 'oauth:' + token;
 
-const botCommands = ['commands', gameCmd, 'discord', 'emotes', 'lurk', 'youtube'];
+const botCommands = ['commands', gameCmd, 'discord', 'emotes', 'lurk', 'song', 'youtube'];
 
 // Used for ensuring the bot doesn't exceed the rate limits
 const msgsLimit = 95;  // Actual limit is 100 messages but err on the safe side
@@ -163,6 +155,11 @@ client.on('connect', function (connection) {
                                     const lurkMsg = `Have a good racclurk, ${displayName}. RaccAttack`;
 
                                     sendRateLimitedUTF(connection, `${msgStarter} :${lurkMsg}`);
+                                    break;
+                                case 'song':
+                                    const song = getSong(audioFile);
+
+                                    sendRateLimitedUTF(connection, `${msgStarter} :${song}`);
                                     break;
                                 case 'youtube':
                                     sendRateLimitedUTF(connection, `${msgStarter} :${youtube}`);
@@ -614,11 +611,28 @@ function convertDuration(duration) {
     return convertedDuration;
 }
 
-// Plays the audio file
-function playAudioFile(audioFile) {
-    cmd.run(`powershell -c (New-Object Media.SoundPlayer '${musicDir}/${audioFile}').PlaySync();`,
+// Returns the song from the audio file's name
+function getSong(audioFile) {
+    return audioFile.substring(0, audioFile.length - 4);
+}
+
+// Plays the audio file at some index in the array of audio files, and
+// executes the callback function when the audio file finishes playing.
+async function playAudioFile(audioFiles, index) {
+    audioFile = audioFiles[index];
+    const audioPath = `'${musicDir}/${audioFile}'`;
+    const song = getSong(audioFile);
+
+    console.log(`Current song: ${song}`);
+
+    cmd.run(`powershell -c (New-Object Media.SoundPlayer ${audioPath}).PlaySync();`,
         function (err, data, stderr) {
-            console.log(`${audioFile.substring(0, audioFile.length - 4)}: done`)
+            console.log(`${song}: done`);
+            if (index == audioFiles.length - 1) {
+                audioFiles = shuffle(audioFiles);
+                index = -1;
+            }
+            setTimeout(() => playAudioFile(audioFiles, index + 1), 1000);
         }
     );
 }
