@@ -632,7 +632,7 @@ async function playAudioFile(audioFiles, index) {
                 audioFiles = shuffle(audioFiles);
                 index = -1;
             }
-            setTimeout(() => playAudioFile(audioFiles, index + 1), 1000);
+            setTimeout(() => playAudioFile(audioFiles, index + 1), 3000);
         }
     );
 }
