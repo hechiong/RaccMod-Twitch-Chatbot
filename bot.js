@@ -621,13 +621,9 @@ function getSong(audioFile) {
 async function playAudioFile(audioFiles, index) {
     audioFile = audioFiles[index];
     const audioPath = `'${musicDir}/${audioFile}'`;
-    const song = getSong(audioFile);
-
-    console.log(`Current song: ${song}`);
 
     cmd.run(`powershell -c (New-Object Media.SoundPlayer ${audioPath}).PlaySync();`,
         function (err, data, stderr) {
-            console.log(`${song}: done`);
             if (index == audioFiles.length - 1) {
                 audioFiles = shuffle(audioFiles);
                 index = -1;
