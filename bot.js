@@ -178,8 +178,8 @@ client.on('connect', function (connection) {
                                         const expirationTime = timestamps.get(userId) + cooldownAmount;
 
                                         if (now < expirationTime) {
-                                            const timeLeft = Math.round((expirationTime - now) / 1000);
-                                            const cdMsg = `You can use '!${botCommand}' in ${timeLeft} seconds.`;
+                                            const timeLeft = convertDuration(Math.round((expirationTime - now) / 1000));
+                                            const cdMsg = `Raccwait ${timeLeft} to raccuse '!${botCommand}'. RaccAttack`;
                                         
                                             sendRateLimitedUTF(connection, `${msgStarter} :${cdMsg}`);
                                             break;
@@ -594,14 +594,15 @@ function capitalize(str) {
 // Converts the unit of some duration from seconds to
 // denominatons of days, hours, minutes, and seconds.
 function convertDuration(duration) {
-    if (isNaN(duration) || (typeof duration == 'string' && parseInt(duration) <= 0)
-        || (typeof str == 'number' && duration <= 0)) {
+    if (isNaN(duration) || (typeof duration == 'string' && parseInt(duration) < 0)
+        || (typeof str == 'number' && duration < 0)) {
         return duration;
     }
 
-    const conversionFactors = [86400, 3600, 60, 1];
-    const denoms = [0, 0, 0, 0];
-    const units = ['raccday', 'racchour', 'raccminute', 'raccsecond'];
+    const conversionFactors = [31536000, 2592000, 604800, 86400, 3600, 60, 1];
+    const denoms = [0, 0, 0, 0, 0];
+    const units = ['raccyear', 'raccmonth', 'raccweek', 'raccday', 'racchour',
+                   'raccminute', 'raccsecond'];
 
     let convertedDuration = '';
     let lastPositiveDenomIdx = -1;
@@ -617,7 +618,9 @@ function convertDuration(duration) {
         seconds %= conversionFactors[i];
     }
 
-    if (numPositiveDenoms == 1) {
+    if (numPositiveDenoms == 0) {
+        convertedDuration = `${duration} ${units[units.length - 1]}s`;
+    } else if (numPositiveDenoms == 1) {
         convertedDuration = `${denoms[lastPositiveDenomIdx]} ${units[lastPositiveDenomIdx]}`;
         if (denoms[lastPositiveDenomIdx] > 1) {
             convertedDuration += 's';
