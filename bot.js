@@ -18,6 +18,8 @@ const client = new WebSocketClient();
 const account = 'raccmod';   // Replace with the account the bot runs as
 const password = 'oauth:' + token;
 
+client.cooldowns = new Map();
+
 const botCommands = ['commands', gameCmd, 'discord', 'emotes', 'lurk', 'raccbark',
                      'song', 'youtube'];
 
@@ -88,15 +90,17 @@ client.on('connect', function (connection) {
                             const msgStarter = `${replyTag} ${commandComponent}`;
 
                             // Handy variables to use for chat commands
+                            const botCommand = parsedMessage.command.botCommand;
                             const displayName = parsedMessage.tags['display-name'];
+                            const userId = parsedMessage.tags['user-id'];
 
-                            switch (parsedMessage.command.botCommand) {
+                            switch (botCommand) {
                                 /*
                                 case 'move':
                                     if (parsedMessage.command.botCommandParams.length == 0 ||
                                         !isNumeric(parsedMessage.command.botCommandParams[0])) {
                                         sendRateLimitedUTF(connection, `PRIVMSG ${channel} :
-                                            !${parsedMessage.command.botCommand} needs 1 numeric parameter.`);
+                                            !${botCommand} needs 1 numeric parameter.`);
                                     } else {
                                         let updateInterval = (parsedMessage.command.botCommandParams[0]) ?
                                             parseInt(parsedMessage.command.botCommandParams[0]) * 1000 * 60 : defaultMoveInterval;
@@ -158,7 +162,35 @@ client.on('connect', function (connection) {
                                     sendRateLimitedUTF(connection, `${msgStarter} :${lurkMsg}`);
                                     break;
                                 case 'raccbark':
+                                    // Cooldown logic (for specifically raccbark, will expand to other commands)
+                                    const cooldowns = client.cooldowns;
+
+                                    if (!cooldowns.has(botCommand)) {
+                                        cooldowns.set(botCommand, new Map());
+                                    }
+
+                                    const now = Date.now();
+                                    const timestamps = cooldowns.get(botCommand);
+                                    const defaultCooldownDuration = 10;
+                                    const cooldownAmount = defaultCooldownDuration * 1000;
+
+                                    if (timestamps.has(userId)) {
+                                        const expirationTime = timestamps.get(userId) + cooldownAmount;
+
+                                        if (now < expirationTime) {
+                                            const timeLeft = Math.round((expirationTime - now) / 1000);
+                                            const cdMsg = `You can use '!${botCommand}' in ${timeLeft} seconds.`;
+                                        
+                                            sendRateLimitedUTF(connection, `${msgStarter} :${cdMsg}`);
+                                            break;
+                                        }
+                                    }
+
                                     cmd.run(`powershell -c (New-Object Media.SoundPlayer ${raccbarkPath}).PlaySync();`);
+
+                                    timestamps.set(userId, now);
+                                    setTimeout(() => timestamps.delete(userId), cooldownAmount);
+
                                     break;
                                 case 'song':
                                     const song = getSong(audioFile);
@@ -626,15 +658,16 @@ async function playAudioFile(audioFiles, index) {
     audioFile = audioFiles[index];
     const audioPath = `'${musicDir}/${audioFile}'`;
 
-    cmd.run(`powershell -c (New-Object Media.SoundPlayer ${audioPath}).PlaySync();`,
-        function (err, data, stderr) {
-            console.log("done");
-            if (index == audioFiles.length - 1) {
-                audioFiles = shuffle(audioFiles);
-                index = -1;
+    setTimeout(() => 
+        cmd.run(`powershell -c (New-Object Media.SoundPlayer ${audioPath}).PlaySync();`,
+            function (err, data, stderr) {
+                if (index == audioFiles.length - 1) {
+                    audioFiles = shuffle(audioFiles);
+                    index = -1;
+                }
+                playAudioFile(audioFiles, index + 1);
             }
-            setTimeout(() => playAudioFile(audioFiles, index + 1), 3000);
-        }
+        ), 1000
     );
 }
 
