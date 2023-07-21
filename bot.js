@@ -2,8 +2,8 @@
 const { channel, discord, token, youtube } = require('./config.json');
 const { gameCmd, guild, server, ign } = require('./game-info.json');
 const { emotes, raccEmotes } = require('./emotes.json');
+const { raccbarkPath } = require('./audio.json');
 const WebSocketClient = require('websocket').client;
-const { getAudioDurationInSeconds } = require('get-audio-duration');
 const cmd = require('node-cmd');
 const fs = require('fs');
 
@@ -18,7 +18,8 @@ const client = new WebSocketClient();
 const account = 'raccmod';   // Replace with the account the bot runs as
 const password = 'oauth:' + token;
 
-const botCommands = ['commands', gameCmd, 'discord', 'emotes', 'lurk', 'song', 'youtube'];
+const botCommands = ['commands', gameCmd, 'discord', 'emotes', 'lurk', 'raccbark',
+                     'song', 'youtube'];
 
 // Used for ensuring the bot doesn't exceed the rate limits
 const msgsLimit = 95;  // Actual limit is 100 messages but err on the safe side
@@ -155,6 +156,9 @@ client.on('connect', function (connection) {
                                     const lurkMsg = `Have a good racclurk, ${displayName}. RaccAttack`;
 
                                     sendRateLimitedUTF(connection, `${msgStarter} :${lurkMsg}`);
+                                    break;
+                                case 'raccbark':
+                                    cmd.run(`powershell -c (New-Object Media.SoundPlayer ${raccbarkPath}).PlaySync();`);
                                     break;
                                 case 'song':
                                     const song = getSong(audioFile);
@@ -624,6 +628,7 @@ async function playAudioFile(audioFiles, index) {
 
     cmd.run(`powershell -c (New-Object Media.SoundPlayer ${audioPath}).PlaySync();`,
         function (err, data, stderr) {
+            console.log("done");
             if (index == audioFiles.length - 1) {
                 audioFiles = shuffle(audioFiles);
                 index = -1;
