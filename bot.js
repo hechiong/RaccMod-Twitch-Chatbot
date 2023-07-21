@@ -21,7 +21,7 @@ const password = 'oauth:' + token;
 client.cooldowns = new Map();
 
 const botCommands = ['commands', gameCmd, 'discord', 'emotes', 'lurk', 'raccbark',
-    'song', 'youtube'];
+                     'song', 'youtube'];
 
 // Used for ensuring the bot doesn't exceed the rate limits
 const msgsLimit = 95;  // Actual limit is 100 messages but err on the safe side
@@ -602,7 +602,7 @@ function convertDuration(duration) {
     const conversionFactors = [31536000, 2592000, 604800, 86400, 3600, 60, 1];
     const denoms = [0, 0, 0, 0, 0];
     const units = ['raccyear', 'raccmonth', 'raccweek', 'raccday', 'racchour',
-        'raccminute', 'raccsecond'];
+                   'raccminute', 'raccsecond'];
 
     let convertedDuration = '';
     let lastPositiveDenomIdx = -1;
