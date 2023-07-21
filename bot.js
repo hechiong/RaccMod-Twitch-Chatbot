@@ -21,7 +21,7 @@ const password = 'oauth:' + token;
 client.cooldowns = new Map();
 
 const botCommands = ['commands', gameCmd, 'discord', 'emotes', 'lurk', 'raccbark',
-                     'song', 'youtube'];
+    'song', 'youtube'];
 
 // Used for ensuring the bot doesn't exceed the rate limits
 const msgsLimit = 95;  // Actual limit is 100 messages but err on the safe side
@@ -141,7 +141,7 @@ client.on('connect', function (connection) {
                                     for (let i = 1; i < raccEmotes.length; i++) {
                                         emotesMsg += ` racc${raccEmotes[i]}`;
                                     }
-                                    
+
                                     for (let i = 0; i < emotes.length; i++) {
                                         emotesMsg += ` ${emotes[i]}`;
                                     }
@@ -180,7 +180,7 @@ client.on('connect', function (connection) {
                                         if (now < expirationTime) {
                                             const timeLeft = convertDuration(Math.round((expirationTime - now) / 1000));
                                             const cdMsg = `Raccwait ${timeLeft} to raccuse '!${botCommand}'. RaccAttack`;
-                                        
+
                                             sendRateLimitedUTF(connection, `${msgStarter} :${cdMsg}`);
                                             break;
                                         }
@@ -203,7 +203,7 @@ client.on('connect', function (connection) {
                                 default:
                                     ; // Ignore all other bot commands or Twitch chat messages
                             }
-                            
+
                             // Send a chat message to first time or returning chatters
                             if (parsedMessage.tags['first-msg'] === '1') {
                                 const welcomeMsg = `Raccwelcome, ${displayName}. RaccAttack`;
@@ -253,12 +253,12 @@ client.on('connect', function (connection) {
                                     // if the user was timed out
                                     const banDuration = convertDuration(parsedMessage.tags['ban-duration']);
                                     const timeoutMsg = `${username} has been raccsentenced to ${banDuration} in raccprison. RaccAttack`;
-                                    
+
                                     sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${timeoutMsg}`);
                                 } else {
                                     // if the user was banned
                                     const banMsg = `${username} has been raccbanished. RaccAttack`;
-                                    
+
                                     sendRateLimitedUTF(connection, `PRIVMSG ${channel} :${banMsg}`);
                                 }
                             } else {
@@ -602,7 +602,7 @@ function convertDuration(duration) {
     const conversionFactors = [31536000, 2592000, 604800, 86400, 3600, 60, 1];
     const denoms = [0, 0, 0, 0, 0];
     const units = ['raccyear', 'raccmonth', 'raccweek', 'raccday', 'racchour',
-                   'raccminute', 'raccsecond'];
+        'raccminute', 'raccsecond'];
 
     let convertedDuration = '';
     let lastPositiveDenomIdx = -1;
@@ -661,7 +661,7 @@ async function playAudioFile(audioFiles, index) {
     audioFile = audioFiles[index];
     const audioPath = `'${musicDir}/${audioFile}'`;
 
-    setTimeout(() => 
+    setTimeout(() =>
         cmd.run(`powershell -c (New-Object Media.SoundPlayer ${audioPath}).PlaySync();`,
             function (err, data, stderr) {
                 if (index == audioFiles.length - 1) {
