@@ -662,7 +662,9 @@ async function playAudioFile(audioFiles, index) {
     const audioPath = `'${musicDir}/${audioFile}'`;
 
     setTimeout(() =>
-        cmd.run(`powershell -c (New-Object Media.SoundPlayer ${audioPath}).PlaySync();`,
+        cmd.run(`powershell -c $PlayWav = New-Object Media.SoundPlayer;` +
+                `$PlayWav.SoundLocation = ${audioPath};` +
+                `$PlayWav.PlaySync();`,
             function (err, data, stderr) {
                 if (index == audioFiles.length - 1) {
                     audioFiles = shuffle(audioFiles);
