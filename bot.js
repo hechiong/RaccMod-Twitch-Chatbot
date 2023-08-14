@@ -7,12 +7,11 @@ const WebSocketClient = require('websocket').client;
 const cmd = require('node-cmd');
 const fs = require('fs');
 
-// Play music
+// Music constant and variables
 const musicDir = "music";
 let audioFiles = fs.readdirSync(`${musicDir}/`);
 let audioFile = "";
 audioFiles = shuffle(audioFiles);
-playAudioFile(audioFiles, 0);
 
 const client = new WebSocketClient();
 const account = 'raccmod';   // Replace with the account the bot runs as
@@ -37,6 +36,9 @@ client.on('connectFailed', function (error) {
 });
 
 client.on('connect', function (connection) {
+    // Play music
+    playAudioFile(audioFiles, 0);
+    
     console.log('WebSocket Client Connected');
 
     // Giving the bot Twitch IRC capabilities.
