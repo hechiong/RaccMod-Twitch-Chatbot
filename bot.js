@@ -311,18 +311,15 @@ function parseMessage(message) {
     };
 
     // The start index. Increments as we parse the IRC message.
-
     let idx = 0;
 
     // The raw components of the IRC message.
-
     let rawTagsComponent = null;
     let rawSourceComponent = null;
     let rawCommandComponent = null;
     let rawParametersComponent = null;
 
     // If the message includes tags, get the tags component of the IRC message.
-
     if (message[idx] === '@') {  // The message includes tags.
         let endIdx = message.indexOf(' ');
         rawTagsComponent = message.slice(1, endIdx);
@@ -331,7 +328,6 @@ function parseMessage(message) {
 
     // Get the source component (nick and host) of the IRC message.
     // The idx should point to the source part; otherwise, it's a PING command.
-
     if (message[idx] === ':') {
         idx += 1;
         let endIdx = message.indexOf(' ', idx);
@@ -340,7 +336,6 @@ function parseMessage(message) {
     }
 
     // Get the command component of the IRC message.
-
     let endIdx = message.indexOf(':', idx);  // Looking for the parameters part of the message.
     if (endIdx == -1) {                      // But not all messages include the parameters part.
         endIdx = message.length;
@@ -349,19 +344,16 @@ function parseMessage(message) {
     rawCommandComponent = message.slice(idx, endIdx).trim();
 
     // Get the parameters component of the IRC message.
-
     if (endIdx != message.length) {  // Check if the IRC message contains a parameters component.
         idx = endIdx + 1;            // Should point to the parameters part of the message.
         rawParametersComponent = message.slice(idx);
     }
 
     // Parse the command component of the IRC message.
-
     parsedMessage.command = parseCommand(rawCommandComponent);
 
     // Only parse the rest of the components if it's a command
     // we care about; we ignore some messages.
-
     if (parsedMessage.command == null) {  // Is null if it's a message we don't care about.
         return null;
     } else {
@@ -382,7 +374,6 @@ function parseMessage(message) {
 }
 
 // Parses the tags component of the IRC message.
-
 function parseTags(tags) {
     // badge-info=;badges=broadcaster/1;color=#0000FF;...
 
@@ -456,7 +447,6 @@ function parseTags(tags) {
             default:
                 // If the tag is in the list of tags to ignore, ignore
                 // it; otherwise, add it.
-
                 if (tagsToIgnore.hasOwnProperty(parsedTag[0])) {
                     ;
                 } else {
